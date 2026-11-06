@@ -10,7 +10,7 @@
   const owner=key?sha(key).then(h=>h===window.STUDIO_HASH):Promise.resolve(false);
   const coll=n=>fs.collection("boards").doc(board).collection(n);
   const db={collection(n){const c=coll(n);return{
-    doc(id){const r=id?c.doc(id):c.doc();return{set:d=>ready.then(()=>r.set(d)),update:d=>ready.then(()=>r.update(d)),delete:()=>ready.then(()=>r.delete())}},
+    doc(id){const r=id?c.doc(id):c.doc();return{set:d=>ready.then(u=>r.set({...d,by:u.uid})),update:d=>ready.then(()=>r.update(d)),delete:()=>ready.then(()=>r.delete())}},
     onSnapshot(ok,err){ready.then(()=>c.onSnapshot(s=>ok({docs:s.docs.map(d=>({id:d.id,data:()=>d.data()}))}),err),err);return()=>{}}}}};
   const user={isOwner:()=>owner,id:()=>ready.then(u=>u.uid),can:async()=>true,canEdit:()=>owner};
   function shrink(file,max,qual){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height));const cv=document.createElement("canvas");cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);cv.getContext("2d").drawImage(im,0,0,cv.width,cv.height);URL.revokeObjectURL(im.src);res(cv.toDataURL("image/jpeg",qual))};im.onerror=rej;im.src=URL.createObjectURL(file)})}
