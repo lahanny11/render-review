@@ -304,7 +304,7 @@ async function saveSticky(n,v,btn){
   if(!S.db){toast("Can't save here. Sign in from your invite email.");return}
   btn.disabled=true;
   try{
-    if(n===S.draft){await col().doc().set({...base(),kind:"sticky",x:+n.x.toFixed(4),y:+n.y.toFixed(4),...v,done:false});S.draft=null}
+    if(n===S.draft){const d={...base(),kind:"sticky",x:+n.x.toFixed(4),y:+n.y.toFixed(4),...v,done:false};S.draft=null;S.open=null;renderStickies();setTool("move");try{await col().doc().set(d)}catch(e){S.draft=n;S.open=n;renderStickies();throw e}}
     else{await col().doc(n.id).update(v);delete n.editing}
     S.open=null;renderStickies();toast("Saved");setTool("move")
   }catch(e){toast(e&&e.code==="invalid_argument"?"View only. Sign in from your invite email to comment.":"Couldn't save. Try again.");btn.disabled=false}}
